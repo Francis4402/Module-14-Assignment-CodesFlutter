@@ -1,0 +1,32 @@
+import 'package:basicapi/gallery.dart';
+import 'package:flutter/material.dart';
+
+class PhotoDetail extends StatelessWidget {
+  final Gallery details;
+
+  const PhotoDetail({Key? key, required this.details}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Photo Details'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.network(details.thumbnailUrl ?? '', width: 300, height: 300, fit: BoxFit.cover),
+              const SizedBox(height: 16),
+              Text('Title: ${details.title ?? ''}', style: const TextStyle(fontSize: 18)),
+              const SizedBox(height: 16),
+              Text('ID: ${details.id ?? ''}', style: const TextStyle(fontSize: 18)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

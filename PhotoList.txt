@@ -1,0 +1,94 @@
+import 'dart:convert';
+
+import 'package:basicapi/PhotoDetail.dart';
+import 'package:basicapi/gallery.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class PhotoList extends StatefulWidget {
+  const PhotoList({super.key});
+
+  @override
+  State<PhotoList> createState() => _PhotoListState();
+}
+
+class _PhotoListState extends State<PhotoList> {
+  List<Gallery> photoList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getphotoListFromApi();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Photo Gallery App'),
+      ),
+      body: ListView.builder(
+        itemCount: photoList.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PhotoDetail(details: photoList[index]),
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                height: 100,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(
+                            photoList[index].thumbnailUrl ?? '',
+                            scale: 1.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      child: Text(
+                        photoList[index].title ?? 'Unknown',
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> getphotoListFromApi() async {
+    Uri uri = Uri.parse('https://jsonplaceholder.typicode.com/photos');
+    http.Response response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+      List<Gallery> galleries =
+          jsonResponse.map((json) => Gallery.fromJson(json)).toList();
+      setState(() {
+        photoList = galleries;
+      });
+    } else {
+      throw Exception('Failed to load photos from API');
+    }
+  }
+}
